@@ -114,14 +114,7 @@ struct DetailedView: View {
                 Spacer()
                 
                 // Add to like
-                Button {
-                    if let photo = vm.photo {
-                        collection.isContains(photoPosition)
-                        ? collection.removeFromFavorites(photo)
-                        : collection.addToFavorites(photo)
-                    }
-                    // storage.create(entity: selectedPhoto)
-                } label: {
+                Button(action: addToFavorites) {
                     Image(systemName: "heart.fill")
                         .resizable()
                         .frame(width: 20, height: 20)
@@ -176,6 +169,14 @@ struct DetailedView: View {
     }
    
     // MARK: - Functions
+    
+    private func addToFavorites() {
+        if let photo = vm.photo {
+            collection.isContains(photoPosition)
+            ? collection.removeFromFavorites(photo)
+            : collection.addToFavorites(photo)
+        }
+    }
     
     private func getDate(_ date: String) -> String {
         let dateFormatter = DateFormatter()
