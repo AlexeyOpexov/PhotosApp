@@ -1,8 +1,9 @@
 # PhotosApp
 
 
-![alt text](https://github.com/opexcode/restapi/blob/main/ph1.png)
+![alt text](https://ibb.co/2yKv2kq)
 
-![alt text](https://github.com/opexcode/restapi/blob/main/ph2.png)
+<img src="https://ibb.co/2yKv2kq">
 
-<img src="https://github.com/opexcode/restapi/blob/main/ph1.png">
+https://ibb.co/2yKv2kq
+https://ibb.co/LCkC8wD
