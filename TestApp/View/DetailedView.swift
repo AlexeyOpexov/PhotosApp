@@ -141,7 +141,6 @@ struct DetailedView: View {
                         loadImageFromCash(url: photo.urls[small]!.absoluteString))
                 ).resizable()
             .resizable()
-            .matchedGeometryEffect(id: "123", in: photoNamespace)
             .aspectRatio(contentMode: .fit)
             .tag(photo.id)
             .onAppear {
