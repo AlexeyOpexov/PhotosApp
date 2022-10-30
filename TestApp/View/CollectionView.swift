@@ -26,7 +26,7 @@ struct CollectionView: View {
             if !collection.favorites.isEmpty {
                 ScrollView(.vertical) {
                     LazyVGrid(columns: columns, spacing: 2) {
-                        ForEach(collection.favorites.reversed(), id: \.key) { _, photo in
+                        ForEach(Array(collection.favorites.values), id: \.self) { photo in
                             photoCell(photo)
                                 .onTapGesture {
                                     withAnimation {

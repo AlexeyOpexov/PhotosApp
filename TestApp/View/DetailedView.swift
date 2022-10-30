@@ -14,16 +14,20 @@ struct DetailedView: View {
     
     @Environment(\.presentationMode) var presentaionMode
     
-    @Namespace private var photoNamespace
+//    @Namespace private var photoNamespace
     
-    @EnvironmentObject var queryResult: PhotosViewModel
-    @EnvironmentObject var collection: CollectionViewModel
-    @EnvironmentObject var storage: CoreDataController
+    @EnvironmentObject var queryResult: PhotosViewModel // Для подгрузки новой страницы
+    @EnvironmentObject var collection: CollectionViewModel // для добавления в избранное
+    @EnvironmentObject var coordinator: Coordinator
+    //    @EnvironmentObject var storage: CoreDataController
     
-    @StateObject var vm = PhotoInfoViewModel()
+    @StateObject var info = PhotoInfoViewModel() // Для информации о текущем фото
+    
+    @State var collectionTemp: [UnsplashPhoto] // Показываемый массив фотографий
     
     @State private var isShowControls = true
-    @State private  var photoPosition = ""
+    @State private  var currentId = ""
+    // Gesture
     @State private var currentAmount: Double = 0.0
     @State private var finalAmount: Double = 1.0
     
@@ -37,9 +41,9 @@ struct DetailedView: View {
             Color.black.opacity(0.9)
                 .edgesIgnoringSafeArea(.all)
             
-            // TODO Photos tabview
-            TabView(selection: $photoPosition) {
-                ForEach(queryResult.photos) { photo in
+            
+            TabView(selection: $currentId) {
+                ForEach(collectionTemp) { photo in
                     photoCell(photo)
                 }
             }.tabViewStyle(.page(indexDisplayMode: .never))
@@ -50,9 +54,9 @@ struct DetailedView: View {
         .onTapGesture {
             withAnimation { isShowControls.toggle() }
         }
-        .onAppear { photoPosition = selectedPhoto.id }
-        .onChange(of: photoPosition) { photo in
-            vm.getPhotoInfo(by: photo)
+        .onAppear { currentId = selectedPhoto.id }
+        .onChange(of: currentId) { photo in
+            info.getPhotoInfo(by: photo)
         }
     }
     
@@ -64,7 +68,7 @@ struct DetailedView: View {
                 Spacer().frame(maxWidth: .infinity, alignment: .center)
 
                 Group {
-                    if let user = vm.photo?.user {
+                    if let user = info.photo?.user {
                         Text(user.name ?? "name")
                             .foregroundColor(.white)
                             .font(.title3)
@@ -93,7 +97,7 @@ struct DetailedView: View {
             HStack {
                 VStack(alignment: .leading, spacing: 10) {
                     // Downloads count
-                    if let downloads = vm.photo?.downloadsCount {
+                    if let downloads = info.photo?.downloadsCount {
                         HStack {
                             Image(systemName: "arrow.down.to.line")
                             Text("\(downloads)")
@@ -101,7 +105,7 @@ struct DetailedView: View {
                     }
                     
                     // Published date
-                    if let creation = vm.photo?.created {
+                    if let creation = info.photo?.created {
                         HStack {
                             Image(systemName: "calendar")
                             Text("\(getDate(creation))")
@@ -118,15 +122,14 @@ struct DetailedView: View {
                     Image(systemName: "heart.fill")
                         .resizable()
                         .frame(width: 20, height: 20)
-                        .foregroundColor(collection.isContains(photoPosition) ? .red : .white)
+                        .foregroundColor(collection.isContains(currentId) ? .red : .white)
                 }
                 .frame(width: 60, height: 60, alignment: .center)
                 .background(.black)
                 .cornerRadius(.infinity)
                 
             }.padding()
-        }
-        .opacity(isShowControls ? 1.0 : 0)
+        }.opacity(isShowControls ? 1.0 : 0)
     }
     
     
@@ -145,8 +148,10 @@ struct DetailedView: View {
             .tag(photo.id)
             .onAppear {
                 // Load next page
-                if queryResult.photos.last?.id == photo.id {
-                    queryResult.fetchNextPage()
+                if collectionTemp.last?.id == photo.id {
+                    if coordinator.path == .search {
+                        queryResult.fetchNextPage()
+                    }
                 }
                 selectedPhoto = photo
             }
@@ -170,8 +175,8 @@ struct DetailedView: View {
     // MARK: - Functions
     
     private func addToFavorites() {
-        if let photo = vm.photo {
-            collection.isContains(photoPosition)
+        if let photo = info.photo {
+            collection.isContains(currentId)
             ? collection.removeFromFavorites(photo)
             : collection.addToFavorites(photo)
         }

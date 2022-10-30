@@ -13,6 +13,7 @@ struct TestAppApp: App {
     @StateObject private var manager = CoreDataController()
     @StateObject private var photos = PhotosViewModel()
     @StateObject private var collection = CollectionViewModel()
+    @StateObject private var coordinator = Coordinator()
     
     var body: some Scene {
         WindowGroup {
@@ -20,6 +21,7 @@ struct TestAppApp: App {
                 .environment(\.managedObjectContext, manager.container.viewContext)
                 .environmentObject(photos)
                 .environmentObject(collection)
+                .environmentObject(coordinator)
         }
     }
 }

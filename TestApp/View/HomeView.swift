@@ -11,15 +11,17 @@ import SDWebImageSwiftUI
 struct HomeView: View {
     
     @EnvironmentObject var vm: PhotosViewModel
+    @EnvironmentObject var collection: CollectionViewModel
+    @EnvironmentObject var coordinator: Coordinator
+//    @Namespace private var photoNamespace
     
-    @Namespace private var photoNamespace
-    
-    @StateObject private var coordinator = Coordinator()
     
     @State private var isShowDetails = false
     @State private var selectedPhoto: UnsplashPhoto?
     
     var body: some View {
+        let favorites = Array(collection.favorites.values)
+        
         ZStack(alignment: .bottom) {
             // Home screen
             Group {
@@ -40,11 +42,12 @@ struct HomeView: View {
             if isShowDetails {
                 if let selectedPhoto = selectedPhoto {
                     DetailedView(
+                        collectionTemp: coordinator.path == .search ? vm.photos : favorites,
                         showDetails: $isShowDetails,
                         selectedPhoto: selectedPhoto
                     )
                     .zIndex(4)
-                    .matchedGeometryEffect(id: "photo.id", in: photoNamespace)
+//                    .matchedGeometryEffect(id: "photo.id", in: photoNamespace)
                 }
             }
             // Custom Tabbar

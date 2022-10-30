@@ -8,7 +8,7 @@
 import Foundation
 
 // A struct representing a photo from the Unsplash API.
-public struct UnsplashPhoto: Codable, Identifiable {
+public struct UnsplashPhoto: Codable, Identifiable, Hashable {
 
     public enum URLKind: String, Codable {
         case raw
@@ -16,6 +16,10 @@ public struct UnsplashPhoto: Codable, Identifiable {
         case regular
         case small
         case thumb
+    }
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
     }
 
 
